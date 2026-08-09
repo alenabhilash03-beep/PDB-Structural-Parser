@@ -19,7 +19,7 @@ def main():
                             print(f"{id} has no atoms associated with chain {args.chain}")
                         continue
                     contact_output(args.chain, protein_name, contacts, args.threshold)
-                    if args.matrix:
+                    if args.matrix and isinstance(dist_matrix, np.ndarray):
                         matrix_generator(dist_matrix, protein_name, nodes)
         except FileNotFoundError:
             sys.exit("File not found")
@@ -28,7 +28,7 @@ def main():
         if len(coordinates) == 0:
                 sys.exit("Invalid ID and/or invalid chain associated with ID")
         contact_output(args.chain, protein_name, contacts, args.threshold)
-        if args.matrix:
+        if args.matrix and isinstance(dist_matrix, np.ndarray):
             matrix_generator(dist_matrix, protein_name, nodes)
 
 def setup_parser():
