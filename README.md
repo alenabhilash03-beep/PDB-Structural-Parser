@@ -8,9 +8,9 @@ A Python pipeline for fetching 3D macromolecular structures from the RCSB Protei
 
 * **RCSB PDB API Integration**: Automatically fetches '.pdb' files and entry metadata directly from the RCSB REST APIs using standard 4-character RCSB PDB IDs.
 * **Vectorized Distance Calculations**: Computes full N x N Euclidean distance matrices for N number of CA atoms with the utilization of NumPy broadcasting operations.
-* **Flexible Contact Cutoffs**: Identifies residue contacts based on user-defined Angstrom thresholds (default: 8.0 Å).
+* **Flexible Contact Cutoffs**: Identifies residue contacts based on Angstrom thresholds that can be set by the user (default is 8.0 Å).
 * **Binary & Weighted Contact Maps**: Supports binary contact matrices (1 for contact, 0 otherwise) or contact matrices with explicit weighted distances.
-* **Chain-Specific Filtering**: Parses individual protein chains or processes full structures across all chains.
+* **Chain-Specific Filtering**: Singles out individual protein chains or processes full structures across all chains.
 * **Batch Processing**: Handles text files containing lists of PDB IDs.
 * **CSV Export Pipeline**: Generates CSV files containing node sequences along with distance/contact matrices ready for graph analysis.
 
@@ -45,12 +45,12 @@ pip install numpy requests
 ### Examples
 
 #### 1. Quick Contact Count (Single PDB)
-Parse a single structure ('1A3N') and count total residue contacts within the default 8.0 Å threshold:
+Parse a single structure ('1A3N') and count total residue contacts within the 8.0 Å threshold:
 
 python PDBStructParser.py --pdb 1A3N
 
 #### 2. Chain-Specific Analysis with Custom Cutoff
-Analyze Chain 'A' of '1A3N' with a stricter spatial contact threshold of 6.5 Å:
+Analyze Chain 'A' of '1A3N' with a contact threshold of 6.5 Å:
 
 python PDBStructParser.py --pdb 1A3N --chain A --threshold 6.5
 
@@ -75,16 +75,16 @@ python PDBStructParser.py --batch PDB.txt --matrix
 
 When '--matrix' ('-m') is enabled, the script outputs two CSV files per processed structure:
 
-1. **Matrix CSV ('{ProteinName}.csv')**: An N x N matrix representing spatial residue interactions.
-   * **Binary Mode (default)**: 1.00 indicates CA - CA distance <= threshold, 0.00 otherwise.
-   * **Weighted Mode ('-w')**: Contains actual Euclidean distances (in Å) for contacts within the threshold, 0.00 otherwise.
-2. **Nodes CSV ('{proteinname}_nodes.csv')**: Sequential indexing mapping each row/column in the matrix to its corresponding amino acid residue (e.g., '1 MET', '2 VAL', '3 LEU').
+1. **Matrix CSV ('{ProteinName}.csv')**: An N x N matrix representing spatial residue contacts/interactions.
+   * **Binary Mode (default)**: 1.00 indicates CA - CA distance <= threshold, while 0.00 otherwise.
+   * **Weighted Mode ('-w')**: Contains actual Euclidean distances (in Å) for contacts within the threshold.
+2. **Nodes CSV ('{proteinname}_nodes.csv')**: Maps each row/column in the matrix to its corresponding amino acid residue (e.g., '1 MET', '2 VAL', '3 LEU').
 
 ---
 
 ## Methodology
 
-1. **Extraction**: Parses standard PDB file formatting to locate 'ATOM' records and extracts 3D Cartesian coordinates (x, y, z) for alpha carbons (CA atom types).
+1. **Extraction**: Parses standard PDB file formatting to locate 'ATOM' records and extracts 3D coordinates (x, y, z) for alpha carbons (CA atom types).
 2. **Broadcasting**: Formats coordinates into an N x N x 3 array to compute pairwise coordinate differences delta x, delta y, delta z against an N x 3 array.
 3. **Distance Matrix**: Computes Euclidean distances:
    d = sqrt((xf - xi)^2 + (yf - yi)^2 + (zf - zi)^2)
